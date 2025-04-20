@@ -52,3 +52,16 @@ export default tseslint.config({
   },
 })
 ```
+src/
+├── components/
+│   ├── Sidebar.tsx
+│   └── Layout.tsx
+├── pages/
+│   ├── HomePage.tsx
+│   ├── FpgaPage.tsx
+│   ├── MicroPage.tsx
+│   ├── SingleBoardPage.tsx
+│   ├── ResultsPage.tsx
+│   └── ProfilePage.tsx
+├── App.tsx
+├── main.tsx
