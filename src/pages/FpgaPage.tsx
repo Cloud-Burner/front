@@ -3,8 +3,6 @@ import { useState, useEffect } from "react";
 import api from "../lib/api";
 import * as RadixTooltip from "@radix-ui/react-tooltip";
 
-
-
 export default function FpgaPage() {
     const [fpgaBoards, setFpgaBoards] = useState<string[]>([]);
     const [selectedBoard, setSelectedBoard] = useState<string | null>(null);
@@ -13,6 +11,8 @@ export default function FpgaPage() {
     const [loading, setLoading] = useState<boolean>(true);
     const [taskCheckLoading, setTaskCheckLoading] = useState<boolean>(false);
     const [hasUnfinishedTask, setHasUnfinishedTask] = useState<boolean>(false);
+    const [message, setMessage] = useState<string | null>(null);
+    const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
 
     useEffect(() => {
         const fetchFpgaBoards = async () => {
@@ -34,7 +34,7 @@ export default function FpgaPage() {
         setSelectedBoard(board);
         setTaskCheckLoading(true);
         try {
-            const response = await api.get("/task", {
+            const response = await api.get("/tasks", {
                 params: {
                     task_type: board,
                     done: false,
@@ -50,7 +50,30 @@ export default function FpgaPage() {
         }
     };
 
-    const canSend = selectedBoard && file1 && file2 && !hasUnfinishedTask;
+    const handleSubmitTask = async () => {
+        if (!selectedBoard || !file1 || !file2) return;
+
+        const formData = new FormData();
+        formData.append("task_type", selectedBoard);
+        formData.append("flash_file", file1);
+        formData.append("instruction_file", file2);
+
+        try {
+            await api.post("/task/fpga", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            setMessage("Заявка успешно отправлена!");
+            setMessageType("success");
+            setSelectedBoard(null);
+            setFile1(null);
+            setFile2(null);
+        } catch (error: any) {
+            console.error("Ошибка отправки задачи:", error);
+            const errorMessage = error.response?.data?.detail || "Ошибка при отправке заявки";
+            setMessage(errorMessage);
+            setMessageType("error");
+        }
+    };
 
     return (
         <div className="grid grid-cols-2 gap-6">
@@ -64,6 +87,12 @@ export default function FpgaPage() {
                     </h2>
                 </div>
                 <div className="p-6 space-y-6">
+                    {message && (
+                        <div className={`p-4 rounded-lg text-center font-semibold ${messageType === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                            {message}
+                        </div>
+                    )}
+
                     {/* Описание */}
                     <p className="text-sm text-gray-500">Загрузите два файла для асинхронной обработки</p>
                     {/* Выбор платы */}
@@ -108,7 +137,7 @@ export default function FpgaPage() {
                     </div>
 
                     {/* Кнопка отправки */}
-                    {selectedBoard && (file1 && file2) && (
+                    {selectedBoard && file1 && file2 && (
                         <div className="pt-4">
                             {taskCheckLoading ? (
                                 <p className="text-gray-400 text-sm">Проверка задач...</p>
@@ -136,7 +165,7 @@ export default function FpgaPage() {
                             ) : (
                                 <button
                                     className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold text-sm px-8 py-4 rounded-xl transition leading-relaxed"
-                                    onClick={() => console.log("Отправляем файлы и выбранную плату")}
+                                    onClick={handleSubmitTask}
                                 >
                                     Отправить
                                 </button>

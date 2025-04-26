@@ -8,11 +8,12 @@ interface User {
     role: string;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
     user: User | null;
     token: string | null;
+    loadingAuth: boolean;
     login: (email: string, password: string) => Promise<void>;
-    register: (data: RegisterData) => Promise<void>;
+    register: (email: string, password: string, first_name: string, last_name: string) => Promise<void>;
     logout: () => void;
 }
 
@@ -30,22 +31,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
     const navigate = useNavigate();
+    const [loadingAuth, setLoadingAuth] = useState(true);
 
     useEffect(() => {
+        const token = localStorage.getItem("token");
         if (token) {
             api.get("/auth/me", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             })
-                .then(res => setUser(res.data))
+                .then((res) => {
+                    setUser(res.data);
+                    setToken(token);
+                })
                 .catch(() => {
-                    setUser(null);
-                    setToken(null);
-                    localStorage.removeItem("token");
+                    logout();
+                })
+                .finally(() => {
+                    setLoadingAuth(false);
                 });
+        } else {
+            setLoadingAuth(false);
         }
-    }, [token]);
+    }, []);
 
     const login = async (email: string, password: string) => {
         const formData = new URLSearchParams();
@@ -82,7 +89,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, register, logout }}>
+        <AuthContext.Provider
+            value={{
+                user,
+                token,
+                loadingAuth,
+                login,
+                register,
+                logout,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );

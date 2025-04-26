@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { Cpu, CircuitBoard, HardDrive, BarChartHorizontal, Home, User, Book, ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext"; // Импортируем useAuth для работы с состоянием авторизации
+import { useAuth } from "../context/AuthContext";
 
 const mainNavItems = [
     { to: "/", label: "Главная", icon: Home },
@@ -20,8 +20,8 @@ const docsNavItems = [
 
 export default function Sidebar() {
     const [openDocs, setOpenDocs] = useState(false);
-    const { user, logout } = useAuth(); // Используем useAuth для получения информации о пользователе
-    const navigate = useNavigate(); // Используем navigate для редиректа
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
     return (
         <aside className="w-64 bg-white border-r border-muted h-screen px-4 py-6 shadow-sm flex flex-col">
