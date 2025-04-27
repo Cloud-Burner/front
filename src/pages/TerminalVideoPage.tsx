@@ -4,6 +4,7 @@ import { Terminal } from "xterm";
 import { AttachAddon } from "xterm-addon-attach";
 import { FitAddon } from "xterm-addon-fit";
 import "xterm/css/xterm.css";
+import api from "../lib/api"; // Не забудь импортировать свой api!
 
 const StreamWithTerminal: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -11,15 +12,61 @@ const StreamWithTerminal: React.FC = () => {
     const socketRef = useRef<WebSocket | null>(null);
     const [playing, setPlaying] = useState(true);
     const [elapsedTime, setElapsedTime] = useState(0);
+    const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
+    const [expired, setExpired] = useState(false);
     const navigate = useNavigate();
 
-    // Таймер
+    useEffect(() => {
+        const fetchBooking = async () => {
+            try {
+                const token = localStorage.getItem("booking_token");
+                if (!token) return;
+
+                const response = await api.get("/booking", { params: { token: token, type: "raspberry_pi" } });
+                const booking = response.data;
+                const endTime = new Date(booking.end_time).getTime();
+                const now = Date.now();
+                const diffSeconds = Math.floor((endTime - now) / 1000);
+                setRemainingSeconds(diffSeconds > 0 ? diffSeconds : 0);
+            } catch (error) {
+                console.error("Ошибка загрузки информации о брони:", error);
+            }
+        };
+
+        fetchBooking();
+    }, []);
+
+    useEffect(() => {
+        if (remainingSeconds === null) return;
+
+        const interval = setInterval(() => {
+            setRemainingSeconds((prev) => {
+                if (prev === null) return null;
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    setExpired(true);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [remainingSeconds]);
+
+    // Локальный таймер стрима (как у тебя был)
     useEffect(() => {
         const interval = setInterval(() => {
             setElapsedTime((prev) => prev + 1);
         }, 1000);
         return () => clearInterval(interval);
     }, []);
+
+    const formatCountdownTime = (seconds: number) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+    };
 
     const formatTime = (seconds: number) => {
         const m = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -32,7 +79,8 @@ const StreamWithTerminal: React.FC = () => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext("2d");
         const img = new Image();
-        const socket = new WebSocket("ws://localhost:8001/ws/viewer");
+        const token = localStorage.getItem("booking_token");
+        const socket = new WebSocket(`ws://localhost:8001/camera/viewer?token=${token}&&type=raspberry_pi`);
         socket.binaryType = "blob";
         socketRef.current = socket;
 
@@ -68,8 +116,8 @@ const StreamWithTerminal: React.FC = () => {
         if (terminalRef.current) {
             term.open(terminalRef.current);
             fitAddon.fit();
-
-            const socket = new WebSocket("ws://localhost:8001/terminal/client");
+            const token = localStorage.getItem("booking_token");
+            const socket = new WebSocket(`ws://localhost:8001/terminal/client?token=${token}`);
             const attachAddon = new AttachAddon(socket);
             term.loadAddon(attachAddon);
         }
@@ -96,10 +144,10 @@ const StreamWithTerminal: React.FC = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-background text-dark">
-            {/* Верхняя панель — вплотную к краю */}
+            {/* Верхняя панель */}
             <div className="bg-primary-50 px-6 pt-4 pb-4 border-b border-muted shadow-sm">
                 <div className="flex justify-between items-center flex-wrap gap-4">
-                    {/* Левая часть: иконка + заголовок + подзаголовок */}
+                    {/* Левая часть */}
                     <div>
                         <div className="flex items-center gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -110,11 +158,15 @@ const StreamWithTerminal: React.FC = () => {
                         <p className="text-gray-500 mt-2 text-sm">Трансляция видео и терминального вывода с удалённого ПК</p>
                     </div>
 
-                    {/* Правая часть: таймер + кнопка */}
-                    <div className="flex items-center gap-4">
-  <span className="text-xl font-medium text-primary-700 whitespace-nowrap">
-    ⏱ {formatTime(elapsedTime)}
-  </span>
+                    {/* Правая часть: таймеры */}
+                    <div className="flex items-center gap-6">
+                        {/* Таймер брони */}
+                        {remainingSeconds !== null && (
+                            <div className={`text-xl font-semibold whitespace-nowrap ${expired ? "text-red-600" : "text-primary-700"}`}>
+                                Осталось {formatCountdownTime(remainingSeconds)} минут
+                            </div>
+                        )}
+
                         <button
                             onClick={() => navigate("/")}
                             className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-4 py-2 rounded-md transition-colors duration-200"
@@ -125,12 +177,10 @@ const StreamWithTerminal: React.FC = () => {
                 </div>
             </div>
 
-
-
             <div className="flex flex-col flex-1 p-4 gap-6 overflow-auto">
                 {/* Видеострим */}
                 <div className="flex flex-col items-center">
-                    <h1 className="text-2xl font-bold mb-2 text-primary-600">🎥 Видео</h1>
+                    <h1 className="text-2xl font-bold mb-2 text-primary-600"> Онлайн трансляция</h1>
                     <div className="relative rounded-xl overflow-hidden shadow-lg">
                         <canvas
                             ref={canvasRef}
@@ -149,7 +199,7 @@ const StreamWithTerminal: React.FC = () => {
                 {/* Терминал */}
                 <div className="flex flex-col">
                     <h2 className="text-xl font-semibold text-primary-700 mb-2">
-                        Удалённый терминал
+                        Терминал платы
                     </h2>
                     <div
                         ref={terminalRef}

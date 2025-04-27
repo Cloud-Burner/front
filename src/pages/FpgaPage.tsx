@@ -2,6 +2,20 @@ import { Upload, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import api from "../lib/api";
 import * as RadixTooltip from "@radix-ui/react-tooltip";
+import { format } from "date-fns";
+
+type Booking = {
+    id: number;
+    start_time: string;
+    end_time: string;
+    type: string;
+    active: boolean;
+};
+
+type AvailableSlot = {
+    start_time: string;
+    end_time: string;
+};
 
 export default function FpgaPage() {
     const [fpgaBoards, setFpgaBoards] = useState<string[]>([]);
@@ -13,6 +27,10 @@ export default function FpgaPage() {
     const [hasUnfinishedTask, setHasUnfinishedTask] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
+
+    const [booking, setBooking] = useState<Booking | null>(null);
+    const [availableSlots, setAvailableSlots] = useState<AvailableSlot[]>([]);
+    const [bookingLoading, setBookingLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchFpgaBoards = async () => {
@@ -74,6 +92,81 @@ export default function FpgaPage() {
             setMessageType("error");
         }
     };
+    const loadBooking = async () => {
+        try {
+            const response = await api.get("/bookings", {
+                params: { equipment_type: "green", only_actual: true },
+            });
+            const bookings = response.data || [];
+            if (bookings.length > 0) {
+                setBooking(bookings[0]);
+            } else {
+                const availResponse = await api.get("/bookings/available", {
+                    params: { type: "green" },
+                });
+
+                const slots: string[] = availResponse.data?.slots || [];
+
+                const available = slots.map((start, idx) => ({
+                    start_time: start,
+                    end_time: slots[idx + 1] || start,
+                })).filter(slot => slot.end_time !== slot.start_time);
+
+                setAvailableSlots(available);
+            }
+        } catch (error) {
+            console.error("Ошибка загрузки брони:", error);
+        } finally {
+            setBookingLoading(false);
+        }
+    };
+    // Бронирование
+    useEffect(() => {
+        loadBooking();
+    }, []);
+
+    const handleDeleteBooking = async () => {
+        if (!booking) return;
+        try {
+            await api.delete(`/booking`, {params: {booking_id: booking.id}});
+            setBooking(null);
+            loadBooking();
+        } catch (error) {
+            console.error("Ошибка удаления брони:", error);
+        }
+    };
+
+    const handleJoinSession = async () => {
+        if (!booking) return;
+
+        try {
+            const response = await api.get("booking/session_token", {params:{booking_id: booking.id}
+            });
+
+            const token = response.data.token;
+            if (token) {
+                localStorage.setItem("booking_token", token);
+                window.location.href = "/fpga/session";
+            } else {
+                console.error("Токен не получен с сервера");
+            }
+        } catch (error) {
+            console.error("Ошибка при получении токена для сессии:", error);
+        }
+    };
+
+    const handleBookSlot = async (slot: AvailableSlot) => {
+        try {
+            await api.post("/booking", {
+                type: "green",
+                start_time: slot.start_time,
+                end_time: slot.end_time,
+            });
+            loadBooking();
+        } catch (error) {
+            console.error("Ошибка бронирования:", error);
+        }
+    };
 
     return (
         <div className="grid grid-cols-2 gap-6">
@@ -92,10 +185,7 @@ export default function FpgaPage() {
                             {message}
                         </div>
                     )}
-
-                    {/* Описание */}
                     <p className="text-sm text-gray-500">Загрузите два файла для асинхронной обработки</p>
-                    {/* Выбор платы */}
                     <div className="space-y-4">
                         <h3 className="text-base font-semibold text-primary-700">Выберите FPGA плату</h3>
 
@@ -120,7 +210,6 @@ export default function FpgaPage() {
                         )}
                     </div>
 
-                    {/* Поля для загрузки файлов */}
                     <div className="space-y-4">
                         <p className="text-sm text-gray-500">Файл прошивки SVF</p>
                         <input
@@ -136,7 +225,6 @@ export default function FpgaPage() {
                         />
                     </div>
 
-                    {/* Кнопка отправки */}
                     {selectedBoard && file1 && file2 && (
                         <div className="pt-4">
                             {taskCheckLoading ? (
@@ -184,9 +272,59 @@ export default function FpgaPage() {
                         Бронь синхронного доступа
                     </h2>
                 </div>
-                <div className="p-6">
-                    <p className="text-sm text-gray-500 mb-4">Форма для бронирования доступа к устройству</p>
-                    <div className="space-y-4 text-gray-600 italic">Здесь будет форма брони (в будущем)</div>
+                <div className="p-6 space-y-4">
+                    {bookingLoading ? (
+                        <p className="text-gray-400 text-sm">Загрузка...</p>
+                    ) : booking ? (
+                        <div className="space-y-4">
+                            <div className="p-4 rounded-lg bg-primary-50 text-primary-800">
+                                <p className="font-semibold">У вас есть бронь:</p>
+                                <p>С {format(new Date(booking.start_time), "dd.MM.yyyy HH:mm")} до {format(new Date(booking.end_time), "dd.MM.yyyy HH:mm")}</p>
+                            </div>
+
+                            {booking.active ? (
+                                <button
+                                    onClick={handleJoinSession}
+                                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg"
+                                >
+                                    Войти в сессию
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleDeleteBooking}
+                                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg"
+                                >
+                                    Удалить бронь
+                                </button>
+                            )}
+                        </div>
+                    ) : availableSlots.length > 0 ? (
+                        Object.entries(
+                            availableSlots.reduce((acc: { [date: string]: AvailableSlot[] }, slot) => {
+                                const date = format(new Date(slot.start_time), "dd.MM.yyyy");
+                                if (!acc[date]) acc[date] = [];
+                                acc[date].push(slot);
+                                return acc;
+                            }, {})
+                        ).map(([date, slots]) => (
+                            <div key={date}>
+                                <h4 className="text-primary-700 font-bold">{date}</h4>
+                                <div className="grid grid-cols-2 gap-3 pt-2">
+                                    {slots.map((slot) => (
+                                        <button
+                                            key={slot.start_time}
+                                            onClick={() => handleBookSlot(slot)}
+                                            className="w-full bg-primary-100 hover:bg-primary-200 text-primary-800 font-semibold py-2 rounded-lg text-sm"
+                                        >
+                                            {format(new Date(slot.start_time), "HH:mm")} — {format(new Date(slot.end_time), "HH:mm")}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-gray-400">Нет доступных слотов для брони</p>
+                    )}
                 </div>
             </div>
         </div>

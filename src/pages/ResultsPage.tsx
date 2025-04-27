@@ -10,8 +10,17 @@ interface Task {
     user_id: number;
 }
 
+interface Booking {
+    id: number;
+    start_time: string;
+    end_time: string;
+    type: string;
+    active: boolean;
+}
+
 export default function ResultsPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(1);
     const [activeTab, setActiveTab] = useState<"tasks" | "bookings">("tasks");
@@ -19,22 +28,41 @@ export default function ResultsPage() {
     const pageSize = 10;
 
     useEffect(() => {
-        if (activeTab === "tasks") {
-            const fetchTasks = async () => {
-                setLoading(true);
-                try {
-                    const response = await api.get("/tasks", { params: { all_tasks: true, limit: pageSize, offset: (page - 1) * pageSize } });
-                    setTasks(response.data);
-                } catch (error) {
-                    console.error("Ошибка загрузки задач:", error);
-                } finally {
-                    setLoading(false);
-                }
-            };
+        const fetchTasks = async () => {
+            setLoading(true);
+            try {
+                const response = await api.get("/tasks", { params: { all_tasks: true, limit: pageSize, offset: (page - 1) * pageSize } });
+                setTasks(response.data);
+            } catch (error) {
+                console.error("Ошибка загрузки задач:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
+        const fetchBookings = async () => {
+            setLoading(true);
+            try {
+                const response = await api.get("/bookings", { params: { all: true } });
+                setBookings(response.data);
+            } catch (error) {
+                console.error("Ошибка загрузки броней:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (activeTab === "tasks") {
             fetchTasks();
+        } else {
+            fetchBookings();
         }
     }, [page, activeTab]);
+
+    const now = new Date();
+
+    const upcomingBookings = bookings.filter((booking) => new Date(booking.start_time) > now);
+    const pastBookings = bookings.filter((booking) => new Date(booking.start_time) <= now);
 
     return (
         <div className="p-6">
@@ -66,7 +94,7 @@ export default function ResultsPage() {
                             ? "bg-primary-600 text-white shadow-md"
                             : "bg-gray-100 text-gray-600 hover:bg-primary-100 hover:text-primary-700"
                     }`}
-                    onClick={() => { setActiveTab("bookings"); setPage(1); }}
+                    onClick={() => { setActiveTab("bookings"); }}
                 >
                     Брони
                 </button>
@@ -91,7 +119,7 @@ export default function ResultsPage() {
                                                 task.done ? (task.result_link?.trim() ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700") : "bg-yellow-100 text-yellow-700"
                                             }`}
                                         >
-                                            {task.done ? (task.result_link?.trim() ? "Ready" : "Ошибка выполнения") : "In Progress"}
+                                            {task.done ? (task.result_link?.trim() ? "Готово" : "Ошибка выполнения") : "В процессе"}
                                         </span>
                                     </div>
 
@@ -119,9 +147,6 @@ export default function ResultsPage() {
                                                 rel="noopener noreferrer"
                                                 className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm px-4 py-2 rounded-lg transition"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                                </svg>
                                                 Скачать
                                             </a>
                                         ) : (
@@ -158,8 +183,76 @@ export default function ResultsPage() {
                     </div>
                 )
             ) : (
-                <div className="text-gray-400 italic mt-8">
-                    Здесь будет список ваших броней устройств (в разработке).
+                <div className="space-y-8">
+                    {/* Предстоящие брони */}
+                    <div>
+                        <h2 className="text-xl font-semibold text-primary-700 mb-4">Предстоящие брони</h2>
+                        {upcomingBookings.length === 0 ? (
+                            <p className="text-gray-400">Нет предстоящих броней.</p>
+                        ) : (
+                            <div className="space-y-4">
+                                {upcomingBookings.map((booking) => (
+                                    <div key={booking.id} className="bg-white p-4 rounded-xl shadow-md border border-muted">
+                                        <div className="text-primary-700 font-semibold">
+                                            <a
+                                                href={booking.type === "raspberry_pi" ? "/single-board" : "/fpga"}
+                                                className="hover:underline hover:text-primary-900 transition"
+                                            >
+                                                {booking.type === "raspberry_pi" ? "Raspberry Pi" : "FPGA"}
+                                            </a>
+                                        </div>
+                                        <div className="text-gray-500 text-sm">
+                                            {new Date(booking.start_time).toLocaleString("ru-RU", {
+                                                day: "numeric",
+                                                month: "long",
+                                                year: "numeric",
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            })} — {new Date(booking.end_time).toLocaleString("ru-RU", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Прошедшие брони */}
+                    <div>
+                        <h2 className="text-xl font-semibold text-primary-700 mb-4">Прошедшие брони</h2>
+                        {pastBookings.length === 0 ? (
+                            <p className="text-gray-400">Нет прошедших броней.</p>
+                        ) : (
+                            <div className="space-y-4">
+                                {pastBookings.map((booking) => (
+                                    <div key={booking.id} className="bg-white p-4 rounded-xl shadow-md border border-muted opacity-70">
+                                        <div className="text-primary-700 font-semibold">
+                                            <a
+                                                href={booking.type === "raspberry_pi" ? "/single-board" : "/fpga"}
+                                                className="hover:underline hover:text-primary-900 transition"
+                                            >
+                                                {booking.type === "raspberry_pi" ? "Raspberry Pi" : "FPGA"}
+                                            </a>
+                                        </div>
+                                        <div className="text-gray-500 text-sm">
+                                            {new Date(booking.start_time).toLocaleString("ru-RU", {
+                                                day: "numeric",
+                                                month: "long",
+                                                year: "numeric",
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            })} — {new Date(booking.end_time).toLocaleString("ru-RU", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

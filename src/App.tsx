@@ -12,7 +12,7 @@ import ResultsPage from "./pages/ResultsPage";
 import ProfilePage from "./pages/ProfilePage";
 import TerminalPage from "./pages/TerminalPage";
 import StreamWithTerminal from "./pages/TerminalVideoPage.tsx";
-import LiveStream from "./pages/StreamViewerPage.tsx";
+import FpgaControlPage from "./pages/FpgaControlPage.tsx";
 
 
 function App() {
@@ -22,14 +22,15 @@ function App() {
             <Route element={<Layout />}>
                 {/* Публичные маршруты */}
                 <Route path="/terminal" element={<TerminalPage />} />
-                <Route path="/stream" element={<StreamWithTerminal />} />
-                <Route path="/rtc" element={<LiveStream />} />
+                {/*<Route path="/rpi/session" element={<StreamWithTerminal />} />*/}
+                <Route path="/fpga/session" element={<FpgaControlPage />} />
 
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
 
                 {/* Защищённые маршруты */}
+                <Route path="/rpi/session"  element={<PrivateRoute><StreamWithTerminal /></PrivateRoute>} />
                 <Route path="/fpga" element={<PrivateRoute><FpgaPage /></PrivateRoute>} />
                 <Route path="/micro" element={<PrivateRoute><MicroPage /></PrivateRoute>} />
                 <Route path="/single-board" element={<PrivateRoute><SingleBoardPage /></PrivateRoute>} />
