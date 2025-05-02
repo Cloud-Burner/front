@@ -183,7 +183,7 @@ const DocFpgaPage: React.FC = () => {
                     <AccordionTrigger
                         className="text-xl bg-purple-50 hover:bg-purple-100 px-4 py-3 rounded-lg shadow-md transition flex items-center gap-3 text-purple-800 font-medium">
                         <FileText size={22}/>
-                        Инструкции и формат файлов
+                        Инструкции
                     </AccordionTrigger>
                     <AccordionContent
                         className="bg-white border-l-4 border-purple-300 shadow-inner px-6 py-6 rounded-b-lg space-y-6 text-gray-800">
@@ -202,11 +202,11 @@ const DocFpgaPage: React.FC = () => {
                             <h3 className="text-lg font-semibold">Пример файла инструкций</h3>
                             <pre
                                 className="bg-gray-100 text-sm p-4 rounded-md shadow-sm overflow-x-auto text-gray-800 font-mono">
-{`write_frame 15
-pin 5 low
-write_frame 30
-pin 6 low
-`}
+                                {`write_frame 15
+                                pin 5 low
+                                write_frame 30
+                                pin 6 low
+                                `}
                             </pre>
                             <ul className="list-disc list-inside text-gray-700">
                                 <li><code>write_frame N</code> — пауза в N "кадрах"</li>
@@ -224,6 +224,62 @@ pin 6 low
                             <p className="text-sm text-gray-500 italic">
                                 * Точные номера пинов и их назначения — в документации к плате (см. выше).
                             </p>
+                            <h4 className="text-sm font-semibold">Подключение пинов Raspberry Pi и FPGA</h4>
+                            <div className="flex flex-wrap gap-6">
+                                <div className="flex-1 min-w-[300px]">
+                                    <h4 className="font-semibold text-purple-700 mb-2"> Синхронный доступ</h4>
+                                    <table className="w-full text-sm border border-gray-300">
+                                        <thead className="bg-gray-100">
+                                        <tr>
+                                            <th className="border px-2 py-1">Paspberry Pi пин</th>
+                                            <th className="border px-2 py-1">FPGA пин</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {[
+                                            ["SW_In[0]", "R16"],
+                                            ["SW_In[1]", "P15"],
+                                            ["SW_In[2]", "P16"],
+                                            ["SW_In[3]", "N15"],
+                                            ["SW_In[4]", "N16"],
+                                            ["SW_In[5]", "M12"],
+                                            ["SW_In[6]", "N14"],
+                                            ["SW_In[7]", "N13"],
+                                        ].map(([sig, pin]) => (
+                                            <tr key={sig}>
+                                                <td className="border px-2 py-1">{sig}</td>
+                                                <td className="border px-2 py-1">{pin}</td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div className="flex-1 min-w-[300px]">
+                                    <h4 className="font-semibold text-purple-700 mb-2">Асинхронный доступ</h4>
+                                    <table className="w-full text-sm border border-gray-300">
+                                        <thead className="bg-gray-100">
+                                        <tr>
+                                            <th className="border px-2 py-1">Paspberry Pi пин</th>
+                                            <th className="border px-2 py-1">FPGA пин</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {[
+                                            ["Key_In[0]", "J14"],
+                                            ["Key_In[1]", "J16"],
+                                            ["Key_In[2]", "J15"],
+                                            ["Key_In[3]", "K16"],
+                                        ].map(([sig, pin]) => (
+                                            <tr key={sig}>
+                                                <td className="border px-2 py-1">{sig}</td>
+                                                <td className="border px-2 py-1">{pin}</td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </section>
 
                         {/* Генерация SVF */}
