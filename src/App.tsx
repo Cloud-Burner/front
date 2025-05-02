@@ -13,6 +13,7 @@ import ProfilePage from "./pages/ProfilePage";
 import TerminalPage from "./pages/TerminalPage";
 import StreamWithTerminal from "./pages/TerminalVideoPage.tsx";
 import FpgaControlPage from "./pages/FpgaControlPage.tsx";
+import DocFpgaPage from "./pages/DocFpgaPage";
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/docs/fpga" element={<DocFpgaPage />} />
 
                 {/* Защищённые маршруты */}
                 <Route path="/rpi/session"  element={<PrivateRoute><StreamWithTerminal /></PrivateRoute>} />

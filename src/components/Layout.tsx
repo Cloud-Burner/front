@@ -11,9 +11,10 @@ export default function Layout({ children }: LayoutProps) {
         <div className="min-h-screen bg-background flex flex-col">
             {/* Header если нужно */}
             <div className="flex flex-1">
-                <Sidebar />
-                <main className="flex-1 p-6">
-                    <Outlet />
+                <Sidebar/>
+                {/*<main className="flex-1 p-6">*/}
+                <main className="ml-64 w-full overflow-y-auto p-6">
+                    <Outlet/>
                     {children}
                 </main>
             </div>
