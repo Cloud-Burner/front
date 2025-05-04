@@ -37,7 +37,7 @@ export default function HomePage() {
                         <CircuitBoard size={32} className="text-green-600 mb-3" />
                         <h3 className="text-lg font-semibold">Микроконтроллеры</h3>
                         <p className="text-sm text-gray-500">
-                            Работайте с микроконтроллерами STM32 и другими через облако.
+                            Работайте с микроконтроллерами atmega и другими через облако.
                         </p>
                     </Link>
 
