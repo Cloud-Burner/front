@@ -64,7 +64,7 @@ const FpgaControlPage: React.FC = () => {
         const ctx = canvas?.getContext("2d");
         const img = new Image();
         // const bookingToken = localStorage.getItem("booking_token");
-        const socket = new WebSocket(`ws://localhost:8001/camera/viewer?token=${bookingToken}&&type=green`);
+        const socket = new WebSocket(`wss://${location.host}/camera/viewer?token=${bookingToken}&&type=green`);
         socket.binaryType = "blob";
         socketRef.current = socket;
 
