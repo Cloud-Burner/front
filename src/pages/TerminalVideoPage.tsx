@@ -80,7 +80,7 @@ const StreamWithTerminal: React.FC = () => {
         const ctx = canvas?.getContext("2d");
         const img = new Image();
         const token = localStorage.getItem("booking_token");
-        const socket = new WebSocket(`ws://localhost:8001/camera/viewer?token=${token}&&type=raspberry_pi`);
+        const socket = new WebSocket(`wss://${location.host}/camera/viewer?token=${token}&&type=raspberry_pi`);
         socket.binaryType = "blob";
         socketRef.current = socket;
 
@@ -117,7 +117,7 @@ const StreamWithTerminal: React.FC = () => {
             term.open(terminalRef.current);
             fitAddon.fit();
             const token = localStorage.getItem("booking_token");
-            const socket = new WebSocket(`ws://localhost:8001/terminal/client?token=${token}`);
+            const socket = new WebSocket(`wss://${location.host}/terminal/client?token=${token}`);
             const attachAddon = new AttachAddon(socket);
             term.loadAddon(attachAddon);
         }
