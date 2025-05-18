@@ -150,9 +150,12 @@ export default function ResultsPage() {
                                                 Скачать
                                             </a>
                                         ) : (
-                                            <span className="text-red-600 text-sm font-semibold">
-                                                Ошибка выполнения
-                                            </span>
+                                            <a
+                                                href={`/results/error`}
+                                                className="text-red-600 text-sm font-semibold hover:underline"
+                                            >
+                                                Ошибка выполнения ((
+                                            </a>
                                         )
                                     ) : (
                                         <span className="text-yellow-600 text-sm font-semibold">

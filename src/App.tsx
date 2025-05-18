@@ -13,6 +13,11 @@ import ProfilePage from "./pages/ProfilePage";
 import TerminalPage from "./pages/TerminalPage";
 import StreamWithTerminal from "./pages/TerminalVideoPage.tsx";
 import FpgaControlPage from "./pages/FpgaControlPage.tsx";
+import FpgaDocPage from "./pages/FpgaDocPage.tsx";
+import MicroDocPage from "./pages/MicroDocPage.tsx";
+import SingleBoardDocPage from "./pages/SIngleBoardDocPage.tsx";
+import ResultsDocPage from "./pages/ResultsDocPage.tsx";
+import ErrorResultPage from "./pages/ErrorResultPage.tsx";
 
 
 function App() {
@@ -28,6 +33,12 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/docs/fpga" element={<FpgaDocPage />} />
+                <Route path="/docs/micro" element={<MicroDocPage />} />
+                <Route path="/docs/single-board" element={<SingleBoardDocPage />} />
+                <Route path="/docs/results" element={<ResultsDocPage />} />
+                <Route path="/result/error" element={<ErrorResultPage />} />
+
 
                 {/* Защищённые маршруты */}
                 <Route path="/rpi/session"  element={<PrivateRoute><StreamWithTerminal /></PrivateRoute>} />
