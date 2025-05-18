@@ -95,6 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 token,
                 loadingAuth,
                 login,
+                // @ts-ignore
                 register,
                 logout,
             }}
