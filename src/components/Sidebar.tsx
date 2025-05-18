@@ -24,7 +24,8 @@ export default function Sidebar() {
     const navigate = useNavigate();
 
     return (
-        <aside className="w-64 bg-white border-r border-muted h-screen px-4 py-6 shadow-sm flex flex-col">
+        // <aside className="w-64 bg-white border-r border-muted h-screen px-4 py-6 shadow-sm flex flex-col">
+        <aside className="sticky top-0 self-start h-screen bg-white border-r border-muted px-4 py-6 shadow-sm flex flex-col min-w-[200px] max-w-[300px] w-full sm:w-1/4 lg:w-1/5">
             {/* Логотип */}
             <div className="flex justify-center mb-12 px-4">
                 <NavLink to="/">
