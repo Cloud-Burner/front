@@ -17,6 +17,8 @@ import FpgaDocPage from "./pages/FpgaDocPage.tsx";
 import MicroDocPage from "./pages/MicroDocPage.tsx";
 import SingleBoardDocPage from "./pages/SIngleBoardDocPage.tsx";
 import ResultsDocPage from "./pages/ResultsDocPage.tsx";
+import ErrorResultPage from "./pages/ErrorResultPage.tsx";
+
 
 function App() {
     return (
@@ -35,6 +37,7 @@ function App() {
                 <Route path="/docs/micro" element={<MicroDocPage />} />
                 <Route path="/docs/single-board" element={<SingleBoardDocPage />} />
                 <Route path="/docs/results" element={<ResultsDocPage />} />
+                <Route path="/result/error" element={<ErrorResultPage />} />
 
 
                 {/* Защищённые маршруты */}
