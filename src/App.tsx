@@ -37,7 +37,7 @@ function App() {
                 <Route path="/docs/micro" element={<MicroDocPage />} />
                 <Route path="/docs/single-board" element={<SingleBoardDocPage />} />
                 <Route path="/docs/results" element={<ResultsDocPage />} />
-                <Route path="/result/error" element={<ErrorResultPage />} />
+                <Route path="/timeout" element={<ErrorResultPage />} />
 
 
                 {/* Защищённые маршруты */}
