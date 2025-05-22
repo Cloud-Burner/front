@@ -33,8 +33,8 @@ const Section = ({
 
 const SingleBoardDocPage: React.FC = () => {
     return (
-        <div className="flex flex-col min-h-screen bg-background text-dark p-6">
-            <div className="max-w-6xl mx-auto w-full">
+        <div className="p-6 space-y-6">
+            <div className="bg-white rounded-2xl shadow-md border border-muted overflow-hidden">
                 <div className="bg-white rounded-2xl shadow-md border border-muted overflow-hidden">
                     <div className="bg-primary-50 px-6 py-3 border-b border-primary-100 flex items-center gap-2">
                         <span className="w-2 h-2 bg-blue-500 rounded-full"/>
@@ -111,24 +111,26 @@ const SingleBoardDocPage: React.FC = () => {
                         </Section>
 
                         <Section title="3. Пример работы">
-  <p>
-    Ниже приведён пример Python-скрипта, демонстрирующего управление сервоприводом SG90 и считывание данных с датчика DHT-11 с использованием библиотек <code>gpiozero</code> и <code>Adafruit_DHT</code>.
-  </p>
+                            <p>
+                                Ниже приведён пример Python-скрипта, демонстрирующего управление сервоприводом SG90 и
+                                считывание данных с датчика DHT-11 с использованием
+                                библиотек <code>gpiozero</code> и <code>Adafruit_DHT</code>.
+                            </p>
 
-  <p className="mt-2">
-    Перед запуском убедись, что библиотеки установлены:
-  </p>
+                            <p className="mt-2">
+                                Перед запуском убедись, что библиотеки установлены:
+                            </p>
 
-  <pre className="bg-muted text-sm rounded-md p-4 whitespace-pre-wrap break-words mb-4">
+                            <pre className="bg-muted text-sm rounded-md p-4 whitespace-pre-wrap break-words mb-4">
     <code className="language-bash">
 {`pip install gpiozero Adafruit_DHT`}
     </code>
   </pre>
 
-  <div className="relative bg-muted rounded-md text-sm overflow-hidden">
-    <button
-      onClick={() => {
-        navigator.clipboard.writeText(`import time
+                            <div className="relative bg-muted rounded-md text-sm overflow-hidden">
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(`import time
 import Adafruit_DHT
 from gpiozero import Servo
 from gpiozero.pins.native import NativeFactory
@@ -163,13 +165,13 @@ try:
 except KeyboardInterrupt:
     print("Остановка скрипта")
 `);
-      }}
-      className="absolute top-2 right-2 z-10 px-3 py-1 text-xs border border-primary-300 rounded-md text-primary-700 hover:bg-primary-100 bg-white/70 backdrop-blur-md transition"
-    >
-      Скопировать
-    </button>
+                                    }}
+                                    className="absolute top-2 right-2 z-10 px-3 py-1 text-xs border border-primary-300 rounded-md text-primary-700 hover:bg-primary-100 bg-white/70 backdrop-blur-md transition"
+                                >
+                                    Скопировать
+                                </button>
 
-    <pre className="whitespace-pre-wrap break-words p-4 text-xs">
+                                <pre className="whitespace-pre-wrap break-words p-4 text-xs">
       <code className="language-python">
 {`import time
 import Adafruit_DHT
@@ -207,8 +209,8 @@ except KeyboardInterrupt:
     print("Остановка скрипта")`}
       </code>
     </pre>
-  </div>
-</Section>
+                            </div>
+                        </Section>
 
                         <Section title="4. Ответы на вопросы">
                             <p><strong>В:</strong> Почему инструкция не выполняется?</p>

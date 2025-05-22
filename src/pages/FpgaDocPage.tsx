@@ -34,8 +34,8 @@ const Section = ({
 
 const FpgaDocPage: React.FC = () => {
     return (
-        <div className="flex flex-col min-h-screen bg-background text-dark p-6">
-            <div className="max-w-6xl mx-auto w-full">
+        <div className="p-6 space-y-6">
+            <div className="bg-white rounded-2xl shadow-md border border-muted overflow-hidden">
                 <div className="bg-white rounded-2xl shadow-md border border-muted overflow-hidden">
                     <div className="bg-primary-50 px-6 py-3 border-b border-primary-100 flex items-center gap-2">
                         <span className="w-2 h-2 bg-indigo-500 rounded-full"/>
