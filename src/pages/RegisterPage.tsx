@@ -1,8 +1,8 @@
-import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import {useAuth} from "../context/AuthContext";
+import {useState} from "react";
 
 export default function RegisterPage() {
-    const { register } = useAuth();
+    const {register} = useAuth();
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -14,11 +14,8 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        try {
-            await register( formData.email,
-                formData.password,
-                formData.first_name,
-                formData.last_name);
+        try {         // @ts-ignore
+            await register(formData);
         } catch (err) {
             setError("Ошибка регистрации. Попробуйте ещё раз.");
         }
@@ -34,7 +31,7 @@ export default function RegisterPage() {
                         type="text"
                         placeholder="Имя"
                         value={formData.first_name}
-                        onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                        onChange={(e) => setFormData({...formData, first_name: e.target.value})}
                         className="w-full p-3 border border-muted rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                         required
                     />
@@ -42,7 +39,7 @@ export default function RegisterPage() {
                         type="text"
                         placeholder="Фамилия"
                         value={formData.last_name}
-                        onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                        onChange={(e) => setFormData({...formData, last_name: e.target.value})}
                         className="w-full p-3 border border-muted rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                         required
                     />
@@ -50,7 +47,7 @@ export default function RegisterPage() {
                         type="email"
                         placeholder="Email"
                         value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
                         className="w-full p-3 border border-muted rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                         required
                     />
@@ -58,7 +55,7 @@ export default function RegisterPage() {
                         type="password"
                         placeholder="Пароль"
                         value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        onChange={(e) => setFormData({...formData, password: e.target.value})}
                         className="w-full p-3 border border-muted rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                         required
                     />
@@ -66,10 +63,11 @@ export default function RegisterPage() {
                         type="text"
                         placeholder="Номер телефона (необязательно)"
                         value={formData.phone_number}
-                        onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                        onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
                         className="w-full p-3 border border-muted rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                     />
-                    <button type="submit" className="w-full bg-primary-600 text-white py-3 rounded-xl hover:bg-primary-700">
+                    <button type="submit"
+                            className="w-full bg-primary-600 text-white py-3 rounded-xl hover:bg-primary-700">
                         Зарегистрироваться
                     </button>
                 </form>

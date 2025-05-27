@@ -18,6 +18,7 @@ import MicroDocPage from "./pages/MicroDocPage.tsx";
 import SingleBoardDocPage from "./pages/SIngleBoardDocPage.tsx";
 import ResultsDocPage from "./pages/ResultsDocPage.tsx";
 import ErrorResultPage from "./pages/ErrorResultPage.tsx";
+import DeveloperDocPage from "./pages/DeveloperDocPage.tsx";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/docs/single-board" element={<SingleBoardDocPage />} />
                 <Route path="/docs/results" element={<ResultsDocPage />} />
                 <Route path="/timeout" element={<ErrorResultPage />} />
+                <Route path="/docs/developers" element={<DeveloperDocPage />} />
 
 
                 {/* Защищённые маршруты */}
