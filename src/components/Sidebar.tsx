@@ -16,6 +16,7 @@ const docsNavItems = [
     { to: "/docs/micro", label: "Документация Micro" },
     { to: "/docs/single-board", label: "Документация Single Board" },
     { to: "/docs/results", label: "Документация Results" },
+    { to: "/docs/developers", label: "Разработчикам" }
 ];
 
 export default function Sidebar() {
@@ -25,9 +26,8 @@ export default function Sidebar() {
 
     return (
         // <aside className="w-64 bg-white border-r border-muted h-screen px-4 py-6 shadow-sm flex flex-col">
-        <aside className="sticky top-0 self-start h-screen bg-white border-r border-muted px-4 py-6 shadow-sm flex flex-col min-w-[200px] max-w-[300px] w-full sm:w-1/4 lg:w-1/5">
-            {/* Логотип */}
-            <div className="flex justify-center mb-12 px-4">
+        <aside className="h-screen overflow-y-auto bg-white border-r border-muted px-4 py-6 shadow-sm flex flex-col min-w-[200px] max-w-[300px] w-full sm:w-1/4 lg:w-1/5">            {/* Логотип */}
+            <div className="flex justify-center mb-12 px-4 shrink-0">
                 <NavLink to="/">
                     <img
                         src="/cb-logo.png"
@@ -38,12 +38,12 @@ export default function Sidebar() {
             </div>
 
             {/* Основная навигация */}
-            <nav className="flex-1 space-y-1">
-                {mainNavItems.map(({ to, label, icon: Icon }) => (
+            <nav className="flex-1 space-y-1 ">
+                {mainNavItems.map(({to, label, icon: Icon}) => (
                     <NavLink
                         to={to}
                         key={to}
-                        className={({ isActive }) =>
+                        className={({isActive}) =>
                             `group flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
                                 isActive
                                     ? "bg-primary-100 text-primary-700 font-semibold"
@@ -51,7 +51,7 @@ export default function Sidebar() {
                             }`
                         }
                     >
-                        <Icon size={20} />
+                        <Icon size={20}/>
                         <span className="group-hover:underline">{label}</span>
                     </NavLink>
                 ))}
@@ -62,18 +62,19 @@ export default function Sidebar() {
                         onClick={() => setOpenDocs(!openDocs)}
                         className="flex items-center gap-3 px-4 py-2 w-full text-left rounded-lg text-gray-600 hover:bg-muted hover:text-gray-900 transition-colors"
                     >
-                        <Book size={20} />
+                        <Book size={20}/>
                         <span className="flex-1">Документация</span>
-                        <ChevronDown size={16} className={`transition-transform ${openDocs ? "rotate-180" : ""}`} />
+                        <ChevronDown size={16} className={`transition-transform ${openDocs ? "rotate-180" : ""}`}/>
                     </button>
 
                     {/* Выпадающие пункты */}
-                    <div className={`mt-1 space-y-1 pl-10 transition-all overflow-hidden ${openDocs ? "max-h-60" : "max-h-0"}`}>
-                        {docsNavItems.map(({ to, label }) => (
+                    <div
+                        className={`mt-1 space-y-1 pl-10 transition-all overflow-hidden ${openDocs ? "max-h-60" : "max-h-0"}`}>
+                        {docsNavItems.map(({to, label}) => (
                             <NavLink
                                 key={to}
                                 to={to}
-                                className={({ isActive }) =>
+                                className={({isActive}) =>
                                     `block text-sm py-1 transition-colors ${
                                         isActive ? "text-primary-700 font-semibold" : "text-gray-500 hover:text-gray-900"
                                     }`
@@ -115,7 +116,7 @@ export default function Sidebar() {
                             onClick={() => navigate("/login")}
                             className="w-full flex items-center justify-center gap-3 p-3 rounded-md border border-primary-600 text-primary-600 font-semibold hover:bg-primary-100 transition-colors"
                         >
-                            <User size={18} className="text-primary-600" />
+                            <User size={18} className="text-primary-600"/>
                             Войти
                         </button>
                     </div>

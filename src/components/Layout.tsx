@@ -8,9 +8,9 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
     return (
-        <div className="min-h-screen bg-background flex">
+        <div className="h-screen min-h-screen bg-background flex">
             <Sidebar />
-            <main className="flex-1 p-6 overflow-y-auto h-screen">
+            <main className="flex-1 p-6 overflow-y-auto ">
                 <Outlet />
                 {children}
             </main>
